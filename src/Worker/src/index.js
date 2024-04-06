@@ -91,12 +91,13 @@ async function handlePublish(json, umbracoHost) {
 		productUpdate.variants(variants);
 	} else {
 		// no variants - set the sales price on the product itself
-		productUpdate.salesPrice([
-			{
-				currency: eur,
-				amount: json.properties.price.withTax
-			}
-		]);
+		const price = [{
+			currency: eur,
+			amount: json.properties.price.withTax
+		}];
+		productUpdate
+			.listPrice(price)
+			.salesPrice(price);
 	}
 
 	// execute the product update
@@ -160,12 +161,14 @@ function extractVariants(json) {
 			]);
 		});
 
+		const price = [{
+			currency: eur,
+			amount: item.content.properties.price.withTax
+		}];
 		return new ProductVariantBuilder({id: item.content.properties.sku})
 			.data(data)
-			.salesPrice([{
-				currency: eur,
-				amount: item.content.properties.price.withTax
-			}])
+			.listPrice(price)
+			.salesPrice(price)
 			.build();
 	});
 }
